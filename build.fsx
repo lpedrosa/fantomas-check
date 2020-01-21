@@ -67,7 +67,7 @@ let checkCodeAndReport (config: FormatConfig) (files: seq<string>): Async<string
             |> Array.choose formattedFilename
     }
 
-Target.create "CheckFormat" (fun _ ->
+Target.create "CheckCodeFormat" (fun _ ->
     let needFormatting = 
         !! "src/**/*.fs"
         -- "src/**/obj/**"

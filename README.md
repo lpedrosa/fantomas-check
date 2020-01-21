@@ -13,39 +13,39 @@ dotnet fake build
 
 ## Running the task
 
-The build script exposes a `CheckFormat` task. This task fails if any source file requires formatting, while also outputting their file names:
+The build script exposes a `CheckCodeFormat` task. This task fails if any source file requires formatting, while also outputting their file names:
 
 ```
-dotnet fake build -t CheckFormat
+dotnet fake build -t CheckCodeFormat
 ```
 
 Sample output:
 
 ```
-run CheckFormat
+run CheckCodeFormat
 Building project with version: LocalBuild
-Shortened DependencyGraph for Target CheckFormat:
-<== CheckFormat
+Shortened DependencyGraph for Target CheckCodeFormat:
+<== CheckCodeFormat
 
 The running order is:
 Group - 1
-  - CheckFormat
-Starting target 'CheckFormat'
+  - CheckCodeFormat
+Starting target 'CheckCodeFormat'
 The following files need formatting:
 /app/src/Sample/Greeting.fs
-Finished (Failed) 'CheckFormat' in 00:00:00.5686893
+Finished (Failed) 'CheckCodeFormat' in 00:00:00.5686893
 
 ---------------------------------------------------------------------
 Build Time Report
 ---------------------------------------------------------------------
 Target        Duration
 ------        --------
-CheckFormat   00:00:00.5648007   (Some files need formatting, check output for more info)
+CheckCodeFormat   00:00:00.5648007   (Some files need formatting, check output for more info)
 Total:        00:00:00.6272949
 Status:       Failure
 ---------------------------------------------------------------------
 Script reported an error:
--> BuildFailedException: Target 'CheckFormat' failed.
+-> BuildFailedException: Target 'CheckCodeFormat' failed.
 -> One or more errors occurred. (Some files need formatting, check output for more info)
 -> Some files need formatting, check output for more info
 Hint: To further diagnose the problem you can run fake in verbose mode `fake -v run ...` or set the 'FAKE_DETAILED_ERRORS' environment variable to 'true'

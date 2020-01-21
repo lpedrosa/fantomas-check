@@ -11,4 +11,4 @@ RUN dotnet tool restore
 COPY src/ src/
 RUN dotnet fake build
 
-ENTRYPOINT ["dotnet", "fake", "build", "-t", "CheckFormat"]
+ENTRYPOINT ["dotnet", "fake", "build", "-t", "CheckCodeFormat"]
