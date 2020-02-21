@@ -2,6 +2,7 @@
 nuget Fake.DotNet.Cli
 nuget Fake.IO.FileSystem
 nuget Fake.Core.Target
+nuget FSharp.Compiler.Service 34.0.1
 nuget Fantomas 3.3.0-beta-002 //"
 #load ".fake/build.fsx/intellisense.fsx"
 
