@@ -30,6 +30,9 @@ Target.create "Build" (fun _ ->
 let fantomasConfig = FormatConfig.Default
 
 Target.create "CheckCodeFormat" (fun _ ->
+    let toErrorline (filename, exn) =
+        sprintf "%s\n %s" filename (exn.ToString())
+
     let needFormatting =
         !! "src/**/*.fs"
         -- "src/**/obj/**"
@@ -39,11 +42,14 @@ Target.create "CheckCodeFormat" (fun _ ->
     if needFormatting.IsValid then
         Trace.log "No files need formatting"
     else
-        Trace.log "The following files need formatting:"
-        needFormatting.Formatted |> List.iter Trace.log
-        Trace.log "The following files had errors while formatting:"
-        needFormatting.Errors |> List.iter (fst >> Trace.log)
-        failwith "Some files need formatting, check output for more info"
+        if needFormatting.HasErrors then
+            Trace.log "The following files had errors while formatting:"
+            needFormatting.Errors |> List.iter (toErrorline >> Trace.log)
+            failwith "Some files had errors while formatting, check output for more info"
+        else
+            Trace.log "The following files need formatting:"
+            needFormatting.Formatted |> List.iter Trace.log
+            failwith "Some files need formatting, check output for more info"
 )
 
 Target.create "All" ignore
