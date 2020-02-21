@@ -2,7 +2,7 @@
 nuget Fake.DotNet.Cli
 nuget Fake.IO.FileSystem
 nuget Fake.Core.Target
-nuget Fantomas 3.1.0 //"
+nuget Fantomas 3.3.0-beta-002 //"
 #load ".fake/build.fsx/intellisense.fsx"
 
 open System.IO
@@ -19,7 +19,7 @@ Target.initEnvironment ()
 Target.create "Clean" (fun _ ->
     !! "src/**/bin"
     ++ "src/**/obj"
-    |> Shell.cleanDirs 
+    |> Shell.cleanDirs
 )
 
 Target.create "Build" (fun _ ->
@@ -29,56 +29,20 @@ Target.create "Build" (fun _ ->
 
 let fantomasConfig = FormatConfig.Default
 
-let removeTemporary (results: FakeHelpers.FormatResult []): unit = 
-    let removeIfHasTemporary result = 
-        match result with
-        | FakeHelpers.Formatted(_, tempFile) -> File.Delete(tempFile)
-        | FakeHelpers.Error(_) | FakeHelpers.Unchanged(_) -> ()
-    results |> Array.iter removeIfHasTemporary 
-
-let checkCodeAndReport (config: FormatConfig) (files: seq<string>): Async<string[]> =
-    async {
-        let! results = files |> FakeHelpers.formatFilesAsync config
-        results |> removeTemporary
-
-        let toChange result = 
-            match result with
-            | FakeHelpers.Formatted(file, _) -> Some(file, None)
-            | FakeHelpers.Error(file, ex) -> Some(file, Some(ex))
-            | FakeHelpers.Unchanged(_) -> None
-
-        let changes =
-            results
-            |> Array.choose toChange
-        
-        let isChangeWithErrors = function
-        | _, Some(_) -> true
-        | _, None -> false
-
-        if Array.exists isChangeWithErrors changes then
-            raise <| FakeHelpers.CodeFormatException changes
-
-        let formattedFilename = function 
-        | _, Some(_) -> None
-        | filename, None -> Some(filename)
-
-        return 
-            changes
-            |> Array.choose formattedFilename
-    }
-
 Target.create "CheckCodeFormat" (fun _ ->
-    let needFormatting = 
+    let needFormatting =
         !! "src/**/*.fs"
         -- "src/**/obj/**"
-        |> checkCodeAndReport fantomasConfig
+        |> FakeHelpers.checkCode fantomasConfig
         |> Async.RunSynchronously
-    
-    match Array.length needFormatting with
-    | 0 -> Trace.log "No files need formatting"
-    | _ -> 
+
+    if needFormatting.IsValid then
+        Trace.log "No files need formatting"
+    else
         Trace.log "The following files need formatting:"
-        needFormatting |> Array.iter Trace.log 
+        needFormatting.Formatted |> List.iter Trace.log
+        Trace.log "The following files had errors while formatting:"
+        needFormatting.Errors |> List.iter (fst >> Trace.log)
         failwith "Some files need formatting, check output for more info"
 )
 
